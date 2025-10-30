@@ -1,6 +1,6 @@
 services:
-  homebox:
-    image: homebox
+  backend:
+    image: homebox-backend
     build:
       context: .
       dockerfile: ./Dockerfile.hardened
@@ -15,5 +15,24 @@ services:
     environment:
       - HBOX_DEBUG=true
       - HBOX_LOGGER_LEVEL=-1
+      - HBOX_WEB_HOST=0.0.0.0
+      - HBOX_WEB_PORT=7745
     ports:
-      - 3100:7745
+      - 7745:7745
+    volumes:
+      - homebox-data:/data
+
+  frontend:
+    image: homebox-frontend
+    build:
+      context: ./frontend-new
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:7745/api/v1
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+
+volumes:
+  homebox-data:
